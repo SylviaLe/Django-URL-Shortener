@@ -1,0 +1,112 @@
+<!-- templates/index.html -->
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1, shrink-to-fit=no">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script   src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <title>URL Shortener</title>
+        <style>
+            body {
+                /* background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); */
+                background: linear-gradient(-45deg, #0a2463, #4b437c, #8b6294, #d8315b, #dc446a);
+                background-size: 400% 400%;
+                animation: gradient 15s ease infinite;
+            }
+
+            @keyframes gradient {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+            input, input:focus, input:active{
+                border-top: none; 
+                border-left: none;
+                border-right:none; 
+                font-size: 24px;
+            }
+            button{
+                border-radius: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div class="container w-50">
+            <div class="main d-flex flex-column justify-content-center align-items-center min-vh-100">
+                <h1 class="my-4 display-4 text-light">URL Shortener Service</h1>
+                <form id='post-form' class="text-center">
+                    {% csrf_token %}
+                    <input type='text' name='link' id='link' class="w-100">
+                    <button class="btn btn-dark text-info d-block mx-auto my-4" type='sumbit' id='shorten'>Shorten</button>
+                </form>
+                <p class='fs-3 text-light'>
+                    Your link is here: 
+                    <span id="result"></span>
+                    <button class="btn btn-light text-end" onclick="copyText('result')" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy"><i class="far fa-copy"></i></button>
+                </p>
+            </div>
+            
+            
+        </div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
+        <script type='text/JavaScript'>
+            //This script will get whatever the user type in the input box, submit to the link with name 'create'. The CreateView will then save it to the model
+            $(document).on('submit', '#post-form', function(e) {
+                e.preventDefault()
+                $.ajax({
+                    type:'POST',
+                    url:'/create/',
+                    data:{
+                        link:$('#link').val(),
+                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success:function(data){
+                        $('span#result').html("localhost:8000/"+data)
+                        //taking the form of localhost:8000 here to align with the url pattern
+                    }
+                })
+            })
+        </script>
+        <script>
+            function copyText(element) {
+                var range, selection, worked;
+                var element = document.getElementById(element)
+
+                if (document.body.createTextRange) {
+                    //create a range, move that range to fit the provided element, and select it
+                    range = document.body.createTextRange();
+                    range.moveToElementText(element);
+                    range.select();
+                } else if (window.getSelection) {
+                    //in case something is already selected on the screen
+                    selection = window.getSelection();
+                    range = document.createRange();
+                    range.selectNodeContents(element);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+
+                try {
+                    document.execCommand('copy');
+                    document.querySelector('button[title="Copy"]').setAttribute("title", "Link Copied!");
+                } catch (err) {
+                    console.log('unable to copy text');
+                }
+            }   
+        </script>
+    </body>
+</html>
